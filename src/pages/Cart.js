@@ -9,11 +9,6 @@ import {
   Paper,
   CardMedia,
   Divider,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogContentText,
-  DialogTitle,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { Add, Remove, Delete, ShoppingCart } from "@mui/icons-material";
@@ -108,7 +103,6 @@ const Cart = () => {
                       height: 180,
                       objectFit: "contain",
                       borderRadius: 2,
-                      backgroundColor: "#f9f9f9",
                     }}
                   />
                   <Box>
