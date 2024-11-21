@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { useCart } from "../contexts/CartContext";
 import {
   Box,
@@ -8,13 +8,20 @@ import {
   IconButton,
   Paper,
   CardMedia,
+  Divider,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
-import { Add, Remove } from "@mui/icons-material";
+import { Add, Remove, Delete, ShoppingCart } from "@mui/icons-material";
 import { total } from "../utils/totalPrice";
 
 const Cart = () => {
-  const { cartItems, removeFromCart, updateQuantity } = useCart();
+  const { cartItems, removeFromCart, updateQuantity, clearCart } = useCart();
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -37,14 +44,44 @@ const Cart = () => {
     }
   };
 
+  const handleClearCart = () => {
+    clearCart();
+    setIsDialogOpen(false); // Close the dialog after clearing
+  };
+
   return (
-    <Box sx={{ padding: 3 }}>
-      <Typography variant="h4" gutterBottom>
-        Shopping Cart
+    <Box sx={{ padding: 3, maxWidth: "1200px", margin: "auto" }}>
+      <Typography variant="h4" gutterBottom textAlign="center">
+        <ShoppingCart color="primary" /> Shopping Cart
       </Typography>
 
       {cartItems.length === 0 ? (
-        <Typography>Your cart is empty.</Typography>
+        <Box
+          sx={{
+            textAlign: "center",
+            marginTop: 6,
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            gap: 2,
+          }}
+        >
+          <Typography variant="h6" color="text.secondary">
+            Your cart is empty.
+          </Typography>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={handleGoToHome}
+            sx={{
+              textTransform: "uppercase",
+              fontWeight: "bold",
+              paddingX: 4,
+            }}
+          >
+            Go to Home
+          </Button>
+        </Box>
       ) : (
         <>
           <Grid container spacing={3}>
@@ -56,7 +93,10 @@ const Cart = () => {
                     padding: 2,
                     display: "flex",
                     flexDirection: "column",
+                    gap: 2,
                     justifyContent: "space-between",
+                    borderRadius: 2,
+                    boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
                   }}
                 >
                   <CardMedia
@@ -64,44 +104,59 @@ const Cart = () => {
                     image={item.image}
                     alt={item.title}
                     sx={{
-                      height: 200,
+                      height: 180,
                       objectFit: "contain",
-                      marginBottom: 2,
+                      borderRadius: 2,
+                      backgroundColor: "#f9f9f9",
                     }}
                   />
-
+                  <Box>
+                    <Typography
+                      variant="h6"
+                      noWrap
+                      sx={{
+                        marginBottom: 1,
+                        fontWeight: 600,
+                        textOverflow: "ellipsis",
+                        overflow: "hidden",
+                        whiteSpace: "nowrap",
+                      }}
+                    >
+                      {item.title}
+                    </Typography>
+                    <Typography
+                      variant="body1"
+                      color="text.secondary"
+                      sx={{ marginBottom: 1 }}
+                    >
+                      ${item.price.toFixed(2)} x {item.quantity} ={" "}
+                      <strong>
+                        ${(item.price * item.quantity).toFixed(2)}
+                      </strong>
+                    </Typography>
+                  </Box>
                   <Box
                     sx={{
                       display: "flex",
-                      flexDirection: "column",
                       justifyContent: "space-between",
+                      alignItems: "center",
                     }}
                   >
-                    <Typography variant="h6" noWrap sx={{ marginBottom: 1 }}>
-                      {item.title}
-                    </Typography>
-
-                    <Box sx={{ display: "flex", alignItems: "center" }}>
+                    <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                       <IconButton
                         onClick={() => handleQuantityChange(item, "decrement")}
+                        disabled={item.quantity === 1}
                         sx={{
-                          padding: 1,
-                          borderRadius: "50%",
                           backgroundColor: "#f0f0f0",
                           "&:hover": { backgroundColor: "#ddd" },
                         }}
-                        disabled={item.quantity == 1}
                       >
                         <Remove />
                       </IconButton>
-                      <Typography variant="body1" sx={{ marginX: 2 }}>
-                        {item.quantity}
-                      </Typography>
+                      <Typography>{item.quantity}</Typography>
                       <IconButton
                         onClick={() => handleQuantityChange(item, "increment")}
                         sx={{
-                          padding: 1,
-                          borderRadius: "50%",
                           backgroundColor: "#f0f0f0",
                           "&:hover": { backgroundColor: "#ddd" },
                         }}
@@ -109,48 +164,172 @@ const Cart = () => {
                         <Add />
                       </IconButton>
                     </Box>
-
-                    <Box
+                    <Button
+                      variant="outlined"
+                      color="error"
+                      size="small"
+                      startIcon={<Delete />}
+                      onClick={() => removeFromCart(item.id)}
                       sx={{
-                        display: "flex",
-                        justifyContent: "space-between",
-                        marginTop: 2,
+                        borderRadius: 1,
+                        paddingX: 2,
+                        textTransform: "none",
+                        fontWeight: 600,
                       }}
                     >
-                      <Typography variant="body1" color="text.secondary">
-                        ${(item.price * item.quantity).toFixed(2)}
-                      </Typography>
-                      <Button
-                        variant="outlined"
-                        color="error"
-                        onClick={() => removeFromCart(item.id)}
-                      >
-                        Remove
-                      </Button>
-                    </Box>
+                      Remove
+                    </Button>
                   </Box>
                 </Paper>
               </Grid>
             ))}
           </Grid>
-
+          <Divider sx={{ marginY: 3 }} />
           <Box
-            sx={{ marginTop: 3, display: "flex", justifyContent: "flex-end" }}
+            sx={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              flexWrap: "wrap",
+              gap: 2,
+              marginTop: 3,
+            }}
           >
-            <Typography variant="h5">
+            <Typography variant="h5" sx={{ fontWeight: 600 }}>
               Total: ${total(cartItems).toFixed(2)}
             </Typography>
+
+            <Box sx={{ display: "flex", gap: 2 }}>
+              <Button
+                variant="outlined"
+                color="error"
+                size="large"
+                onClick={() => setIsDialogOpen(true)}
+                sx={{
+                  textTransform: "none",
+                  borderRadius: 2,
+                  paddingX: 4,
+                  fontWeight: 600,
+                  "&:hover": {
+                    backgroundColor: "#f44336",
+                    color: "white",
+                  },
+                }}
+              >
+                Clear Cart
+              </Button>
+              <Button
+                variant="contained"
+                color="primary"
+                size="large"
+                onClick={handleGoToHome}
+                sx={{
+                  textTransform: "none",
+                  borderRadius: 2,
+                  paddingX: 4,
+                  fontWeight: 600,
+                }}
+              >
+                Continue Shopping
+              </Button>
+            </Box>
           </Box>
+          <Dialog
+      open={isDialogOpen}
+      aria-labelledby="clear-cart-dialog-title"
+      aria-describedby="clear-cart-dialog-description"
+      sx={{
+        "& .MuiDialog-paper": {
+          borderRadius: "16px", // Rounded corners
+          padding: "2rem", // Padding around content
+          boxShadow: "0 6px 20px rgba(0, 0, 0, 0.15)", // Soft shadow for depth
+        },
+      }}
+      BackdropProps={{
+        // Adding inert to backdrop disables all interactions outside the dialog
+        inert: "true",
+      }}
+    >
+      <DialogTitle
+        id="clear-cart-dialog-title"
+        sx={{
+          textAlign: "center",
+          fontWeight: 700,
+          backgroundColor: "#f44336",
+          color: "white",
+          paddingY: 2,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        Confirm Clear Cart
+      </DialogTitle>
+
+      <DialogContent
+        sx={{
+          paddingY: 2,
+          display: "flex",
+          justifyContent: "center",
+          textAlign: "center",
+        }}
+      >
+        <DialogContentText
+          id="clear-cart-dialog-description"
+          sx={{
+            fontSize: "16px",
+            color: "text.secondary",
+            lineHeight: 1.5,
+          }}
+        >
+          Are you sure you want to clear all items from your cart? This action cannot be undone.
+        </DialogContentText>
+      </DialogContent>
+
+      <DialogActions
+        sx={{
+          display: "flex",
+          justifyContent: "space-between",
+          paddingX: 3,
+          paddingBottom: 2,
+        }}
+      >
+        <Button
+          onClick={() => setIsDialogOpen(false)}
+          color="primary"
+          variant="outlined"
+          sx={{
+            textTransform: "none",
+            fontWeight: 600,
+            paddingX: 3,
+            borderRadius: "8px",
+            "&:hover": {
+              backgroundColor: "#f5f5f5",
+            },
+          }}
+        >
+          Cancel
+        </Button>
+        <Button
+          onClick={handleClearCart}
+          color="error"
+          variant="contained"
+          sx={{
+            textTransform: "none",
+            fontWeight: 600,
+            paddingX: 3,
+            borderRadius: "8px",
+            "&:hover": {
+              backgroundColor: "#d32f2f",
+            },
+          }}
+        >
+          Clear Cart
+        </Button>
+      </DialogActions>
+    </Dialog>
         </>
       )}
-
-      <Box
-        sx={{ display: "flex", gap: 2, marginTop: 3, justifyContent: "center" }}
-      >
-        <Button variant="contained" color="primary" onClick={handleGoToHome}>
-          Go to Home
-        </Button>
-      </Box>
     </Box>
   );
 };

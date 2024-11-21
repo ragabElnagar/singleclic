@@ -27,7 +27,6 @@ const ProductCard = ({ product }) => {
   return (
     <Card
       sx={{
-        maxWidth: 345,
         display: "flex",
         flexDirection: "column",
         cursor: "pointer",
@@ -41,6 +40,7 @@ const ProductCard = ({ product }) => {
         alt={product.title}
         sx={{
           objectFit: "contain",
+          paddingTop:"10px"
         }}
       />
       <CardContent>

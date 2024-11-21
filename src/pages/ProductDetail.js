@@ -2,11 +2,11 @@ import React from "react";
 import {  useNavigate } from "react-router-dom";
 import { CircularProgress, Typography, Box, Button } from "@mui/material";
 import { useCart } from "../contexts/CartContext";
-import useProductDetail from "../hooks/ProductDetail";
+import useProductDetail from "../hooks/useProductDetail";
 
 const ProductDetail = () => {
   const { addToCart } = useCart();
-  const { product, loading } = useProductDetail();
+  const { product, loading, error } = useProductDetail();
   const navigate = useNavigate();
 
   if (loading)
@@ -22,7 +22,7 @@ const ProductDetail = () => {
         <CircularProgress />
       </Box>
     );
-  if (!product) return <Typography>Product not found.</Typography>;
+  if (!product) return <Typography color="error">Product not found.</Typography>;
 
   const handleAddToCart = () => {
     addToCart(product);
