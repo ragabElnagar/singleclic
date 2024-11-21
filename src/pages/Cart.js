@@ -18,10 +18,11 @@ import {
 import { useNavigate } from "react-router-dom";
 import { Add, Remove, Delete, ShoppingCart } from "@mui/icons-material";
 import { total } from "../utils/totalPrice";
+import CustomDialog from "../components/CustomDialog";
 
 const Cart = () => {
-  const { cartItems, removeFromCart, updateQuantity, clearCart } = useCart();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const { cartItems, removeFromCart, updateQuantity, clearCart } = useCart();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -46,7 +47,7 @@ const Cart = () => {
 
   const handleClearCart = () => {
     clearCart();
-    setIsDialogOpen(false); // Close the dialog after clearing
+    setIsDialogOpen(false);
   };
 
   return (
@@ -234,100 +235,11 @@ const Cart = () => {
               </Button>
             </Box>
           </Box>
-          <Dialog
-      open={isDialogOpen}
-      aria-labelledby="clear-cart-dialog-title"
-      aria-describedby="clear-cart-dialog-description"
-      sx={{
-        "& .MuiDialog-paper": {
-          borderRadius: "16px", // Rounded corners
-          padding: "2rem", // Padding around content
-          boxShadow: "0 6px 20px rgba(0, 0, 0, 0.15)", // Soft shadow for depth
-        },
-      }}
-      BackdropProps={{
-        // Adding inert to backdrop disables all interactions outside the dialog
-        inert: "true",
-      }}
-    >
-      <DialogTitle
-        id="clear-cart-dialog-title"
-        sx={{
-          textAlign: "center",
-          fontWeight: 700,
-          backgroundColor: "#f44336",
-          color: "white",
-          paddingY: 2,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-        }}
-      >
-        Confirm Clear Cart
-      </DialogTitle>
-
-      <DialogContent
-        sx={{
-          paddingY: 2,
-          display: "flex",
-          justifyContent: "center",
-          textAlign: "center",
-        }}
-      >
-        <DialogContentText
-          id="clear-cart-dialog-description"
-          sx={{
-            fontSize: "16px",
-            color: "text.secondary",
-            lineHeight: 1.5,
-          }}
-        >
-          Are you sure you want to clear all items from your cart? This action cannot be undone.
-        </DialogContentText>
-      </DialogContent>
-
-      <DialogActions
-        sx={{
-          display: "flex",
-          justifyContent: "space-between",
-          paddingX: 3,
-          paddingBottom: 2,
-        }}
-      >
-        <Button
-          onClick={() => setIsDialogOpen(false)}
-          color="primary"
-          variant="outlined"
-          sx={{
-            textTransform: "none",
-            fontWeight: 600,
-            paddingX: 3,
-            borderRadius: "8px",
-            "&:hover": {
-              backgroundColor: "#f5f5f5",
-            },
-          }}
-        >
-          Cancel
-        </Button>
-        <Button
-          onClick={handleClearCart}
-          color="error"
-          variant="contained"
-          sx={{
-            textTransform: "none",
-            fontWeight: 600,
-            paddingX: 3,
-            borderRadius: "8px",
-            "&:hover": {
-              backgroundColor: "#d32f2f",
-            },
-          }}
-        >
-          Clear Cart
-        </Button>
-      </DialogActions>
-    </Dialog>
+          <CustomDialog
+            handleClearCart={handleClearCart}
+            isDialogOpen={isDialogOpen}
+            setIsDialogOpen={() => setIsDialogOpen(false)}
+          />
         </>
       )}
     </Box>
